@@ -25,7 +25,7 @@ export const MOCK: DB = {
     { id: "l4", nome: "Pedro Almeida", whatsapp: "(51) 98111-2233", email: "pedro@email.com", destino: "Gramado, RS", dias: 5, plano: "vip", valor: 174.5, estilos: ["Gastronomia", "Aventura & Natureza"], companhia: "Casal", orcamento: "Alto Padrão", obs: "", status: "Perdido", criadoEm: d(-3) },
   ],
   clientes: [
-    { id: "c1", nome: "Lucas Ferreira", contato: "(11) 98888-7777", destino: "Caraguatatuba, SP", dias: 0, valor: 139.6, pagamento: "Pago" } as Cliente,
+    { id: "c1", nome: "Lucas Ferreira", contato: "(11) 98888-7777", destino: "Caraguatatuba, SP", valor: 139.6, pagamento: "Pago" },
     { id: "c2", nome: "Camila Rocha", contato: "(21) 99777-6655", destino: "Jericoacoara, CE", valor: 244.3, pagamento: "Aguardando PIX" },
     { id: "c3", nome: "Bruno Martins", contato: "(41) 98444-3322", destino: "Florianópolis, SC", valor: 99.5, pagamento: "Pago" },
   ],
