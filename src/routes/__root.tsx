@@ -9,6 +9,8 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Plane, LayoutDashboard } from "lucide-react";
+import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -78,11 +80,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "TripTailor — Roteiros de viagem sob medida em 24h" },
+      { name: "description", content: "Roteiros de viagem personalizados em PDF, entregues em até 24h no WhatsApp." },
+      { property: "og:title", content: "TripTailor — Roteiros sob medida" },
+      { property: "og:description", content: "Roteiros de viagem personalizados entregues em 24h." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
@@ -92,6 +93,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -103,7 +106,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
@@ -121,7 +124,23 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-card/90 backdrop-blur">
+        <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+          <Link to="/" className="flex items-center gap-2 text-lg font-extrabold text-primary">
+            TripTailor <Plane className="h-5 w-5" />
+          </Link>
+          <div className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
+            <a href="/#como-funciona" className="hover:text-primary">Como funciona</a>
+            <a href="/#destinos" className="hover:text-primary">Destinos</a>
+            <a href="/#plano" className="hover:text-primary">Monte seu plano</a>
+          </div>
+          <Link to="/admin" className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary">
+            <LayoutDashboard className="h-4 w-4" /> Painel Admin
+          </Link>
+        </nav>
+      </header>
+      <div className="pt-16"><Outlet /></div>
+      <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
 }
