@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- App data (leads, clientes, entregas, lembretes) is stored in browser localStorage via src/lib/store.ts with seeded demo data; swap to Lovable Cloud when multi-device sync is needed.
