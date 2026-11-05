@@ -121,11 +121,15 @@ Corrija todos os botões e ações de redirecionamento para o WhatsApp na Landin
 ## 🌐 5. Acesso à Aplicação Publicada
 
 * **Landing Page e Simulador de Planos:** [https://triptailor-dio.lovable.app](https://triptailor-dio.lovable.app)
+
+  
 ![Landing Page do TripTailor](./assets/landing-page.png)
 ![Simulador de Planos do TripTailor](./assets/plan-trip.png)
 
 
 * **Painel Administrativo (Leads, Clientes, Entregas e Lembretes):** Acessível pelo botão **Painel Admin** no menu superior da aplicação.
+
+  
 ![Painel Admin do TripTailor](./assets/admin-dashboard.png)
 ---
 
