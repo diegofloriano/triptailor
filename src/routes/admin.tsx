@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Users, UserCheck, FileCheck, DollarSign, MessageSquare, UserPlus, Send, Plus, Lock } from "lucide-react";
-import { PLANS, brl, waLink } from "@/lib/pricing";
+import { PLANS, brl } from "@/lib/pricing";
+import { WhatsAppDialog, type WaMessage } from "@/components/WhatsAppDialog";
 import { useDB, uid, type LeadStatus, type EntregaStatus, type Lembrete } from "@/lib/store";
 
 export const Route = createFileRoute("/admin")({
@@ -56,6 +57,8 @@ function Dashboard() {
   const [db, update] = useDB();
   const [tab, setTab] = useState<"leads" | "clientes" | "entregas" | "lembretes">("leads");
   const receita = db.clientes.reduce((s, c) => s + c.valor, 0);
+  const [wa, setWa] = useState<WaMessage>(null);
+  const T = "Mensagem para o Cliente";
 
   const converter = (id: string) => {
     const l = db.leads.find((x) => x.id === id)!;
@@ -115,7 +118,7 @@ function Dashboard() {
                     <div className="mt-1"><Pill v={l.status} /></div>
                   </td>
                   <td className="space-y-1.5 px-4 py-3">
-                    <a target="_blank" rel="noreferrer" href={waLink(l.whatsapp, `Olá, ${l.nome.split(" ")[0]}! Aqui é da TripTailor ✈️ Recebemos seu pedido de roteiro para ${l.destino} (${l.dias} dias). Vamos alinhar os detalhes?`)} className={`${btn} bg-success text-success-foreground`}><MessageSquare className="h-3.5 w-3.5" />WhatsApp</a>
+                    <button onClick={() => setWa({ title: T, phone: l.whatsapp, text: `Olá, ${l.nome.split(" ")[0]}! Aqui é da TripTailor ✈️ Recebemos seu pedido de roteiro para ${l.destino} (${l.dias} dias). Vamos alinhar os detalhes?` })} className={`${btn} bg-success text-success-foreground`}><MessageSquare className="h-3.5 w-3.5" />Chamar no WhatsApp</button>
                     {l.status !== "Convertido" && <button onClick={() => converter(l.id)} className={`${btn} bg-primary text-primary-foreground`}><UserPlus className="h-3.5 w-3.5" />Converter</button>}
                   </td>
                 </tr>
@@ -124,7 +127,8 @@ function Dashboard() {
           </table>
         )}
 
-        {tab === "clientes" && <Clientes />}
+        {tab === "clientes" && <Clientes onWa={(c) => setWa({ title: T, phone: c.contato, text: `Olá, ${c.nome.split(" ")[0]}! Aqui é da TripTailor ✈️ Sobre seu roteiro para ${c.destino} (${brl(c.valor)}): ${c.pagamento === "Pago" ? "pagamento confirmado, obrigado!" : "segue a chave PIX para finalizarmos."}` })} />}
+        <WhatsAppDialog msg={wa} onClose={() => setWa(null)} />
         {tab === "entregas" && (
           <table className="w-full text-sm">
             <thead className="bg-muted text-left text-xs uppercase text-muted-foreground"><tr>{["Cliente", "Destino", "Dias", "Prazo", "Status", "Link do PDF", ""].map((h) => <th key={h} className="px-4 py-3">{h}</th>)}</tr></thead>
@@ -143,7 +147,7 @@ function Dashboard() {
                   </td>
                   <td className="px-4 py-3"><input className="input-base min-w-48 py-1 text-xs" placeholder="Cole o link do Drive/Canva" value={e.pdf} onChange={(ev) => update((d) => ({ ...d, entregas: d.entregas.map((x) => (x.id === e.id ? { ...x, pdf: ev.target.value } : x)) }))} /></td>
                   <td className="px-4 py-3">
-                    <button disabled={!e.pdf} onClick={() => window.open(waLink(e.contato, `Olá, ${e.cliente.split(" ")[0]}! Seu roteiro de ${e.destino} está pronto 🎉\n\n${e.pdf}\n\nBoa viagem! — TripTailor`), "_blank")} className={`${btn} bg-success text-success-foreground disabled:opacity-40`}><Send className="h-3.5 w-3.5" />Enviar</button>
+                    <button disabled={!e.pdf} onClick={() => setWa({ title: T, phone: e.contato, text: `Olá, ${e.cliente.split(" ")[0]}! Seu roteiro de ${e.destino} está pronto 🎉\n\n${e.pdf}\n\nBoa viagem! — TripTailor` })} className={`${btn} bg-success text-success-foreground disabled:opacity-40`}><Send className="h-3.5 w-3.5" />Enviar Roteiro</button>
                   </td>
                 </tr>
               ))}
@@ -156,7 +160,7 @@ function Dashboard() {
   );
 }
 
-function Clientes() {
+function Clientes({ onWa }: { onWa: (c: { nome: string; contato: string; destino: string; valor: number; pagamento: string }) => void }) {
   const [db, update] = useDB();
   const [n, setN] = useState({ nome: "", contato: "", destino: "", valor: "" });
   return (
@@ -176,7 +180,8 @@ function Clientes() {
             <tr key={c.id} className="border-t border-border">
               <td className="px-4 py-3 font-semibold">{c.nome}</td><td className="px-4 py-3">{c.contato}</td><td className="px-4 py-3">{c.destino}</td>
               <td className="px-4 py-3 font-semibold">{brl(c.valor)}</td><td className="px-4 py-3"><Pill v={c.pagamento} /></td>
-              <td className="px-4 py-3">
+              <td className="space-x-1.5 whitespace-nowrap px-4 py-3">
+                <button onClick={() => onWa(c)} className={`${btn} bg-success text-success-foreground`}><MessageSquare className="h-3.5 w-3.5" />Chamar no WhatsApp</button>
                 <button onClick={() => update((d) => ({ ...d, clientes: d.clientes.map((x) => (x.id === c.id ? { ...x, pagamento: x.pagamento === "Pago" ? "Aguardando PIX" : "Pago" } : x)) }))} className={`${btn} border border-border`}>
                   {c.pagamento === "Pago" ? "Marcar pendente" : "Marcar como Pago"}
                 </button>
