@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Users, Clock, PiggyBank, UserRound, MessageCircle, FileText, MapPin, Check, MessageSquare, ArrowRight } from "lucide-react";
-import { PLANS, calcTotal, brl, waLink, WHATSAPP_NUMBER, type PlanKey } from "@/lib/pricing";
+import { PLANS, calcTotal, brl, WHATSAPP_NUMBER, type PlanKey } from "@/lib/pricing";
+import { WhatsAppDialog, type WaMessage } from "@/components/WhatsAppDialog";
 import { useDB, uid } from "@/lib/store";
 
 const HERO = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80";
@@ -46,6 +47,7 @@ function Index() {
   const [f, setF] = useState({ nome: "", whatsapp: "", email: "", destino: "", dias: 5, plano: "express" as PlanKey, estilos: [] as string[], companhia: "Casal", orcamento: "Moderado", obs: "" });
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((p) => ({ ...p, [k]: v }));
   const total = calcTotal(f.dias, f.plano);
+  const [wa, setWa] = useState<WaMessage>(null);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,13 +56,14 @@ function Index() {
       return;
     }
     update((db) => ({ ...db, leads: [{ id: uid(), ...f, valor: total, status: "Novo", criadoEm: new Date().toISOString().slice(0, 10) }, ...db.leads] }));
-    toast.success("Pedido registrado! Abrindo o WhatsApp...");
-    const msg = `Olá, TripTailor! ✈️ Quero meu roteiro:\n\n• Nome: ${f.nome}\n• Destino: ${f.destino}\n• Dias: ${f.dias}\n• Plano: ${PLANS[f.plano].name}\n• Estilo: ${f.estilos.join(", ") || "-"}\n• Viajando com: ${f.companhia}\n• Orçamento: ${f.orcamento}${f.obs ? `\n• Obs: ${f.obs}` : ""}\n\n💰 Valor total: ${brl(total)}`;
-    window.open(waLink(WHATSAPP_NUMBER, msg), "_blank");
+    toast.success("Pedido registrado!");
+    const text = `Olá, TripTailor! ✈️ Quero meu roteiro:\n\n• Nome: ${f.nome}\n• Destino: ${f.destino}\n• Dias: ${f.dias}\n• Plano: ${PLANS[f.plano].name}\n• Estilo: ${f.estilos.join(", ") || "-"}\n• Viajando com: ${f.companhia}\n• Orçamento: ${f.orcamento}${f.obs ? `\n• Obs: ${f.obs}` : ""}\n\n💰 Valor total: ${brl(total)}`;
+    setWa({ title: "Pedido Pronto para Envio no WhatsApp! 🚀", phone: WHATSAPP_NUMBER, text });
   };
 
   return (
     <main>
+      <WhatsAppDialog msg={wa} onClose={() => setWa(null)} />
       <section className="relative flex min-h-[640px] items-center overflow-hidden">
         <img src={HERO} alt="Praia paradisíaca com mar azul" className="absolute inset-0 h-full w-full object-cover" />
         <div className="bg-hero-overlay absolute inset-0" />
